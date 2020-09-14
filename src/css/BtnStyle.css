@@ -1,0 +1,14 @@
+.btnArea{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 5px;
+}
+.featureBtn{
+    padding: 3px 10px;
+    background-color: rgba(51, 51, 51, 0.5);
+    color: #ffffff;
+    margin-left: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
