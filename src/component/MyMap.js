@@ -9,7 +9,7 @@ import OSM from 'ol/source/OSM';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Draw from 'ol/interaction/Draw';
-import {fromLonLat} from 'ol/proj'
+import {fromLonLat,transformExtent} from 'ol/proj'
 
 
 const MyMap = () => {
@@ -31,7 +31,8 @@ const MyMap = () => {
         view: new View({
           projection: 'EPSG:3857',
           center: fromLonLat([127,36],"EPSG:3857"),
-          zoom: zoom
+          zoom: zoom,
+          extent: transformExtent([123.44238281249997, 32.74570253945518, 132.71484375, 39.00637903337457], 'EPSG:4326', 'EPSG:3857'),
         })
       });
 
