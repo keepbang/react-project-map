@@ -9,8 +9,12 @@ import OSM from 'ol/source/OSM';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Draw from 'ol/interaction/Draw';
-import {fromLonLat,transformExtent} from 'ol/proj'
+import {fromLonLat,transformExtent,transform} from 'ol/proj'
+import {Circle as CircleStyle, Fill, Stroke, Style,Icon} from 'ol/style';
 
+import Point from 'ol/geom/Point';
+
+import Feature from 'ol/Feature';
 
 const MyMap = () => {
     let zoom = 4;
@@ -44,6 +48,7 @@ const MyMap = () => {
         }else{
             console.log("zoom fail");
         }
+        console.log(vector);
     }
 
     const zoomOut = () =>{
@@ -65,12 +70,61 @@ const MyMap = () => {
         if (value !== 'None') {
             draw = new Draw({
             source: source,
-            type: e.target.getAttribute("name")
+            type: e.target.getAttribute("name"),
+            style: new Style({
+                fill: new Fill({
+                  color: 'rgba(255, 255, 255, 0.2)',
+                }),
+                stroke: new Stroke({
+                  color: '#ffcc33',
+                  width: 2,
+                }),
+                image: new CircleStyle({
+                  radius: 7,
+                  fill: new Fill({
+                    color: '#ffcc33',
+                  }),
+                }),
+              }),
             });
             map.addInteraction(draw);
         }else{
             map.getLayers().array_[1].getSource().clear();
         }
+    }
+
+    const getCenter = () => {
+        console.log("test")
+        var iconFeature = new Feature({
+            geometry: new Point(map.getView().getCenter()),
+            name: transform(map.getView().getCenter(),"EPSG:3857","EPSG:4326").toString(),
+            population: 4000,
+            rainfall: 500,
+          });
+
+        var iconStyle = new Style({
+        fill: new Fill({
+            color: 'rgba(255, 255, 255, 0.2)',
+          }),
+          stroke: new Stroke({
+            color: '#ffcc33',
+            width: 2,
+          }),
+          
+        });
+
+        iconFeature.setStyle(iconStyle);
+
+        var iconSource = new VectorSource({
+            features: [iconFeature],
+        });
+
+        var iconLayer = new VectorLayer({
+        source: iconSource,
+        });
+
+        map.addLayer(iconLayer);
+
     }
 
     return (
@@ -79,6 +133,7 @@ const MyMap = () => {
             <span className="featureBtn" name="LineString" onClick={addInteraction}>Line</span>
             <span className="featureBtn" name="Polygon" onClick={addInteraction}>Polygon</span>
             <span className="featureBtn" name="None" onClick={addInteraction}>None</span>
+            <span className="featureBtn" name="None" onClick={getCenter}>Center</span>
             <span className="featureBtn" name="ZoomIn" onClick = {zoomIn}>ZoomIn</span>
             <span className="featureBtn" name="ZoomOut" onClick = {zoomOut}>ZoomOut</span>
         </div>
