@@ -1,5 +1,6 @@
 import React,{ useState } from 'react';
 import '../css/BtnStyle.css';
+import marker from '../images/marker.png';
 
 
 import 'ol/ol.css';
@@ -18,6 +19,10 @@ import Feature from 'ol/Feature';
 
 const MyMap = () => {
     let zoom = 4;
+
+    let layers = {
+      vector : {}
+    }
     
     let source = new VectorSource({wrapX: false});
 
@@ -25,13 +30,16 @@ const MyMap = () => {
         source: source
     });
 
+    layers["drawVectorLayer"] = vector;
+
     const map = new Map({
         target: 'map',
         layers: [
-          new TileLayer({
-            source: new OSM()
-          })
-        ,vector],
+            new TileLayer({
+              source: new OSM()
+            })
+          ,layers["drawVectorLayer"]
+        ],
         view: new View({
           projection: 'EPSG:3857',
           center: fromLonLat([127,36],"EPSG:3857"),
@@ -48,7 +56,7 @@ const MyMap = () => {
         }else{
             console.log("zoom fail");
         }
-        console.log(vector);
+        console.log(map);
     }
 
     const zoomOut = () =>{
@@ -94,34 +102,44 @@ const MyMap = () => {
     }
 
     const getCenter = () => {
+
+        let layerName = "iconLayer";
+
+        map.removeLayer(layers[layerName]);
+
         console.log("test")
         var iconFeature = new Feature({
             geometry: new Point(map.getView().getCenter()),
             name: transform(map.getView().getCenter(),"EPSG:3857","EPSG:4326").toString(),
-            population: 4000,
-            rainfall: 500,
           });
 
         var iconStyle = new Style({
-        fill: new Fill({
+          fill: new Fill({
             color: 'rgba(255, 255, 255, 0.2)',
           }),
           stroke: new Stroke({
-            color: '#ffcc33',
+            color: '#ff3366',
             width: 2,
           }),
-          
+          image: new CircleStyle({
+            radius: 10,
+            fill: new Fill({
+              color: '#ff3366',
+            }),
+          }),
         });
 
         iconFeature.setStyle(iconStyle);
 
         var iconSource = new VectorSource({
-            features: [iconFeature],
+            features: [iconFeature]
         });
 
+        
         var iconLayer = new VectorLayer({
-        source: iconSource,
+          source: iconSource
         });
+        layers[layerName] = iconLayer;
 
         map.addLayer(iconLayer);
 
